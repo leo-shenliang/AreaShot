@@ -56,6 +56,7 @@ MOUNT_POINT="$(hdiutil attach -nobrowse -readonly "$DMG" | tail -1 | awk -F '\t'
 ls -la "$MOUNT_POINT"
 hdiutil detach "$MOUNT_POINT" >/dev/null
 
-shasum -a 256 "$DMG" | tee "$DMG.sha256"
+HASH="$(shasum -a 256 "$DMG" | awk '{print $1}')"
+printf '%s  %s\n' "$HASH" "$(basename "$DMG")" | tee "$DMG.sha256"
 echo
 echo "DMG: $DMG"

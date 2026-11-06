@@ -1,98 +1,188 @@
 # AreaShot
 
-macOS 选区截图原型：菜单栏常驻，按 `Option + Shift + A` 或菜单项进入选区，松开鼠标后截图并弹出预览（自动复制到剪贴板）。
+<p align="center">
+  <img src="Support/social-preview.png" alt="AreaShot — open-source macOS screenshot and annotation tool" width="100%">
+</p>
 
-> 当前分享版只暴露「区域截图」入口。全屏、一体化、定时、重复上次、剪贴板、
-> 窗口吸附与窗口阴影暂时隐藏，相关实现仍保留在代码中，便于后续恢复。
+<p align="center">
+  <a href="https://github.com/leo-shenliang/AreaShot/releases/latest"><img src="https://img.shields.io/github/v/release/leo-shenliang/AreaShot?display_name=release" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/leo-shenliang/AreaShot" alt="License"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%2014%2B-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-lightgrey" alt="Architectures">
+</p>
 
-## 环境要求
+<p align="center">
+  <b><a href="https://github.com/leo-shenliang/AreaShot/releases/latest">Download for macOS</a></b>
+  ·
+  <a href="#中文说明">中文说明</a>
+</p>
 
-- macOS 14+
-- Swift 6.x（Command Line Tools 即可，不要求完整 Xcode）
+AreaShot is a lightweight, open-source macOS screenshot tool. Press one shortcut, drag an area, then annotate, pin, copy, or save — everything stays on your Mac. No account, no upload, no cloud.
 
-## 构建与运行
+Built with Swift and AppKit on top of ScreenCaptureKit. It lives in the menu bar and has no Dock icon.
+
+## Features
+
+- **Area capture** with a single shortcut: `Option + Shift + A`
+- **Annotation editor**: arrow, line, rectangle, ellipse, pen, highlight, text, counter, spotlight, loupe, pixelate, blur, and solid redaction
+- **Text options**: inline editing, auto-grow, four styles, alignment, weight, font, and size
+- **Object editing**: multi-select, move, eight-way resize, snapping, duplicate, copy/paste, layers, lock, and hide
+- **Pin window**: keep a capture floating above other windows; drag, resize, or copy it
+- **Copy or save**: copy the result to the clipboard or export a PNG
+- **Universal build**: Apple Silicon and Intel, macOS 14 or later
+
+> This release exposes area capture only. Fullscreen, window snapping, self-timer, repeat-last-area, clipboard capture, and window shadow are implemented but temporarily hidden in the shared build.
+
+## Install
+
+1. Download the latest DMG from [Releases](https://github.com/leo-shenliang/AreaShot/releases/latest).
+2. Open the DMG and drag **AreaShot.app** into **Applications**.
+3. On first launch, macOS may say the developer cannot be verified. Right-click AreaShot and choose **Open**, or run:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/AreaShot.app
+   ```
+
+4. The first time you capture, allow **Screen Recording** in System Settings → Privacy & Security, then quit and relaunch AreaShot.
+
+The app is ad-hoc signed and not notarized, so the manual confirmation above is expected. The DMG and its SHA-256 checksum are attached to every release.
+
+## Use
+
+| Action | Shortcut |
+| --- | --- |
+| Capture an area | `Option + Shift + A` |
+| Undo / redo in the editor | `Cmd + Z` / `Cmd + Shift + Z` |
+| Copy / paste annotations | `Cmd + C` / `Cmd + V` |
+| Duplicate a selection | `Cmd + D` |
+| Delete a selection | `Delete` |
+| Copy from a pin window | `Cmd + C` or the copy button |
+
+## Build from source
+
+Requirements: macOS 14+, Swift 6.x (Command Line Tools are enough; full Xcode is not required).
 
 ```bash
-chmod +x scripts/build-app.sh
+chmod +x scripts/*.sh
 ./scripts/build-app.sh
 open build/AreaShot.app
 ```
 
-首次触发截图时，系统会要求「屏幕录制」权限：
-
-1. 在提示中允许，或到「系统设置 > 隐私与安全性 > 屏幕录制」勾选 AreaShot
-2. 授权后重新启动应用（TCC 对进程生效）
-
-## 打包分享
+Create a universal DMG:
 
 ```bash
 ./scripts/package-dmg.sh
 ```
 
-生成 `dist/AreaShot-<版本>-universal.dmg`（arm64 + x86_64），内含
-`Applications` 快捷方式和安装说明。
+This writes `dist/AreaShot-<version>-universal.dmg` with an `Applications` shortcut and an install note.
 
-分发版使用 ad-hoc 签名，未经 Apple 公证，朋友首次打开需要右键点击应用 →
-「打开」，或在「系统设置 > 隐私与安全性」中点击「仍要打开」。若本机有
-Developer ID，可传入签名身份：
+## How it compares
 
-```bash
-CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" ./scripts/package-dmg.sh
-```
+| | AreaShot | CleanShot X | Shottr |
+| --- | --- | --- | --- |
+| Price | Free | Paid | Free |
+| Open source | Yes | No | No |
+| Local-only processing | Yes | Yes, with optional cloud features | Yes |
+| Annotation editor | Yes | Yes | Yes |
+| Pin to screen | Yes | Yes | Yes |
 
-仍需使用 `notarytool` 公证并 stapling 后才能免除首次确认。
+AreaShot is intentionally small: area capture, a focused annotation editor, and pin. If you need scrolling capture, video, or cloud sharing, use a dedicated tool.
 
-## 已实现
+## FAQ
 
-- 菜单栏图标与菜单
-- 快捷键：`Option + Shift + A` 区域截图
-- 截图模式：区域、窗口吸附、全屏、All-in-One（Area/Window/Screen 切换）、5 秒自拍定时、重复上次区域、从剪贴板截图
-- 捕获选项：显示光标、包含窗口阴影
-- 多显示器：每块屏幕一个选区覆盖层
-- 标注工具：选择、箭头（标准/双头/曲线）、直线、矩形、椭圆、画笔、高亮、文字、序号、聚光灯、放大镜、马赛克、模糊、纯色遮盖
-- 编辑器工具栏：上方为工具选择 + 随当前工具变化的属性（颜色/线宽/箭头样式/文字样式/聚光灯/强度/序号），下方为缩放、图层、撤销/重做、插图、Emoji、Pin、复制、保存、关闭
-- 聚光灯：可调变暗程度与椭圆/矩形形状；马赛克/模糊：可调强度；序号可重置
-- 文字：内联输入、自动扩展、四套样式、对齐/字重/字体/字号
-- 对象：多选、移动、八向缩放、对齐吸附、复制/粘贴、层级调整、锁定/隐藏、图层列表
-- 插入图片、Emoji
-- Pin 浮窗：置顶显示、拖动、缩放、复制、关闭
-- 编辑后可复制到剪贴板或保存 PNG；撤销/重做（Cmd+Z / Cmd+Shift+Z）
+**Why does macOS block the first launch?**
+The app is not signed with an Apple Developer ID and is not notarized. Right-click → Open, or remove the quarantine attribute as shown above.
 
-## 结构
+**Does AreaShot upload my screenshots?**
+No. There is no network code in the app. Captures stay in memory, the clipboard, or the file you export.
+
+**Why is there no Dock icon?**
+AreaShot is a menu-bar app (`LSUIElement`). Open it from the menu bar, Spotlight, or Launchpad; the icon is visible in Finder and Applications.
+
+**Why is only area capture shown?**
+The other capture modes are present in the code but intentionally hidden in this shared build. They can be re-enabled without changing the capture pipeline.
+
+## Project layout
 
 ```
 Sources/AreaShot/
-  main.swift                 应用入口（accessory 模式，无 Dock 图标）
-  AppDelegate.swift          权限检查与截图流程编排
-  StatusItemController.swift 菜单栏与菜单
-  HotKeyManager.swift        Carbon 全局快捷键
-  SelectionOverlay.swift     覆盖层窗口与选区视图
-  ScreenCaptureService.swift ScreenCaptureKit 截图与裁剪
-  AnnotationEditor.swift      标注画布、工具与编辑器窗口
+  main.swift                 App entry point (accessory mode)
+  AppDelegate.swift          Permission checks and capture flow
+  StatusItemController.swift Menu bar item and menu
+  HotKeyManager.swift        Carbon global hotkeys
+  SelectionOverlay.swift     Overlay windows and area selection
+  ScreenCaptureService.swift ScreenCaptureKit capture and cropping
+  AnnotationEditor.swift     Annotation model and canvas
+  AnnotationEditorWindow.swift Editor window, toolbar and actions
+  PinWindow.swift            Floating pin window
 Support/Info.plist
-Support/AppIcon.icns          应用图标
+Support/AppIcon.icns
+Support/social-preview.png
 scripts/build-app.sh
-scripts/package-dmg.sh       通用版 DMG 打包
-scripts/make-icon.swift      图标绘制脚本
+scripts/package-dmg.sh
+scripts/make-icon.swift
+scripts/make-social-preview.swift
 ```
 
-## 原型边界与后续
+## Known limitations
 
-当前只覆盖单屏内选区（跨屏拖拽会被限制在起始屏幕）。
+- Area selection is limited to one screen per capture; cross-screen drags are clamped to the starting screen.
+- Crop, rotate, flip, background beautification, and object rotation are not implemented.
+- The shared build hides fullscreen, window snapping, self-timer, repeat-last-area, clipboard capture, and window shadow.
+- The app is ad-hoc signed; rebuilding changes the signature and may require granting Screen Recording again.
 
-尚未实现：
+## 中文说明
 
-1. 跨屏选区（需要全局选区会话与多屏拼接）
-2. 裁剪、旋转、翻转（需要可调整尺寸的编辑器与文档级变换撤销）
-3. 背景美化（壁纸/纯色/透明、内边距、投影）
-4. 对象旋转
-5. 隐藏桌面图标、录制时隐藏通知（系统级行为）
+AreaShot 是一个轻量的开源 macOS 截图工具：按 `Option + Shift + A` 进入区域截图，松开鼠标后进入标注编辑器，可标注、Pin 置顶、复制或保存 PNG。所有处理都在本机完成，没有账号、上传或云服务。
 
-## 注意
+当前分享版只暴露「区域截图」入口。全屏、窗口吸附、定时、重复上次、剪贴板、窗口阴影等模式暂时隐藏，相关实现仍保留在代码中。
 
-- 截图为全屏捕获后裁剪，保证不同显示器坐标系下结果正确；若追求性能，可改用 `SCStreamConfiguration.sourceRect` 直接截取选区。
-- 覆盖层关闭后延迟 80ms 再截图，避免遮罩本身被拍进去。
-- 本地开发使用 ad-hoc 签名；更换签名会重置屏幕录制授权。发布前需 Developer ID 签名并公证。
+### 安装
+
+1. 从 [Releases](https://github.com/leo-shenliang/AreaShot/releases/latest) 下载最新 DMG。
+2. 打开 DMG，将 AreaShot 拖入 Applications。
+3. 首次打开若提示「无法验证开发者」，右键点击 AreaShot →「打开」，或执行：
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/AreaShot.app
+   ```
+
+4. 首次截图时授予「屏幕录制」权限，然后退出并重新启动应用。
+
+应用使用 ad-hoc 签名，未做 Apple 公证，因此首次打开需要手动确认。每个 Release 都附带 DMG 和 SHA-256 校验文件。
+
+### 功能
+
+- 区域截图与多显示器覆盖层
+- 标注：箭头（标准/双头/曲线）、直线、矩形、椭圆、画笔、高亮、文字、序号、聚光灯、放大镜、马赛克、模糊、纯色遮盖
+- 文字：内联输入、自动扩展、四套样式、对齐/字重/字体/字号
+- 对象：多选、移动、八向缩放、对齐吸附、复制/粘贴、层级调整、锁定/隐藏、图层列表
+- 聚光灯可调暗度与椭圆/矩形形状；马赛克/模糊可调强度；序号可重置
+- Pin 浮窗：置顶显示、拖动、缩放、复制、关闭
+- 编辑结果可复制到剪贴板或保存 PNG；支持撤销/重做
+
+### 从源码构建
+
+```bash
+chmod +x scripts/*.sh
+./scripts/build-app.sh
+open build/AreaShot.app
+```
+
+打包通用版 DMG：
+
+```bash
+./scripts/package-dmg.sh
+```
+
+生成 `dist/AreaShot-<版本>-universal.dmg`，内含 `Applications` 快捷方式和安装说明。
+
+### 已知限制
+
+- 当前只覆盖单屏内选区，跨屏拖拽会被限制在起始屏幕。
+- 尚未实现裁剪、旋转、翻转、背景美化和对象旋转。
+- 分享版隐藏了全屏、窗口吸附、定时、重复上次、剪贴板和窗口阴影。
+- 应用使用 ad-hoc 签名；重新构建会改变签名，可能需要重新授予屏幕录制权限。
 
 ## License
 
