@@ -1,0 +1,6 @@
+.DS_Store
+.build/
+build/
+dist/
+Support/AppIcon.iconset/
+docs/cleanshotx-toolbar-evidence.md
