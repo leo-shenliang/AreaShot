@@ -33,6 +33,14 @@ Built with Swift and AppKit on top of ScreenCaptureKit. It lives in the menu bar
 
 > This release exposes area capture only. Fullscreen, window snapping, self-timer, repeat-last-area, clipboard capture, and window shadow are implemented but temporarily hidden in the shared build.
 
+## Screenshots
+
+<p align="center">
+  <img src="Support/editor.jpg" alt="AreaShot annotation editor" width="900">
+</p>
+
+<p align="center"><em>Area capture opens directly in the annotation editor.</em></p>
+
 ## Install
 
 1. Download the latest DMG from [Releases](https://github.com/leo-shenliang/AreaShot/releases/latest).
